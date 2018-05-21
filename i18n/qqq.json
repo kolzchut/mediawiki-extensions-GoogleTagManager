@@ -1,0 +1,9 @@
+{
+	"@metadata": {
+		"authors": [
+			"Dror S [FFS]"
+		]
+	},
+	"googletagmanager-desc": "{{desc|name=google Tag Manager|url=https://github.com/kolzchut/mediawiki-extensions-GoogleTagManager}}",
+	"right-noanalytics": "{{doc-right|noanalytics}}"
+}

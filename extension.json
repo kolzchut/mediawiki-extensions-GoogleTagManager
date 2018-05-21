@@ -1,0 +1,48 @@
+{
+	"name": "Google Tag Manager",
+	"version": "0.1.0",
+	"author": [
+		"Dror S. [FFS] ([https://www.kolzchut.org.il Kol-Zchut])"
+	],
+	"url": "https://github.com/kolzchut/mediawiki-extensions-GoogleTagManager",
+	"descriptionmsg": "googletagmanager-desc",
+	"license-name": "GPL-2.0+",
+	"type": "other",
+	"GroupPermissions": {
+		"bot": {
+			"noanalytics": true
+		}
+	},
+	"MessagesDirs": {
+		"GoogleTagManager": [
+			"i18n"
+		]
+	},
+	"AutoloadClasses": {
+		"GoogleTagManagerHooks": "GoogleTagManager.hooks.php"
+	},
+	"Hooks": {
+		"SkinHelenaBodyStart": "GoogleTagManagerHooks::onSkinHelenaBodyStart",
+		"BeforePageDisplay": "GoogleTagManagerHooks::onBeforePageDisplay"
+	},
+	"config": {
+		"GoogleTagManagerContainerID": {
+			"value": null
+		},
+		"GoogleTagManagerIgnoreNsIDs": {
+			"value": []
+		},
+		"GoogleTagManagerIgnorePages": {
+			"value": []
+		},
+		"GoogleTagManagerIgnoreSpecials": {
+			"value": [
+				"Userlogin",
+				"Userlogout",
+				"Preferences",
+				"ChangePassword"
+			]
+		}
+	},
+	"manifest_version": 2
+}
