@@ -5,5 +5,8 @@
 		]
 	},
 	"googletagmanager-desc": "{{desc|name=google Tag Manager|url=https://github.com/kolzchut/mediawiki-extensions-GoogleTagManager}}",
-	"right-noanalytics": "{{doc-right|noanalytics}}"
+	"right-noanalytics": "{{doc-right|noanalytics}}",
+	"googletagmanager-disabled-for-user": "HTML comment injected to say tracking is disabled for user",
+	"googletagmanager-disabled-for-page": "HTML comment injected to say tracking is disabled on this specific page",
+	"googletagmanager-error-not-configured": "HTML comment injected to say $wgGoogleTagManagerContainerID was not defined"
 }

@@ -21,5 +21,8 @@ loaded for them. By default only bots have this right.
 
 ## Changelog ##
 
-### v0.1.0
+### 0.2.0
+Lint the code
+
+### 0.1.0
 - Initial version
