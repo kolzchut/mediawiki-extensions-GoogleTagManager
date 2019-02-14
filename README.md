@@ -13,13 +13,17 @@ as it requires the skin's unique hook for after-<body> code insertion
 | Variable                                           | Value | Explanation
 |----------------------------------------------------|-------|-------------------
 | $wgGoogleTagManagerContainerID                     | null  | Your container ID
-
+| $GoogleTagManagerMediaWikiEvents                   | []    | an array of MediaWiki event names, subscribed through mw.trackEvent(). Events will be pushed as-is to the dataLayer - an `event` name + a `eventData` object.
 
 ### Exemption from tracking
 Users with the "noanalytics" right are exempt from tracking, and this will not be
 loaded for them. By default only bots have this right.
 
 ## Changelog ##
+
+### 0.3.0
+- Add option to pass MediaWiki events (see `mw.trackSubscribe()` in
+  `mediawiki.js` into the dataLayer.
 
 ### 0.2.0
 Lint the code

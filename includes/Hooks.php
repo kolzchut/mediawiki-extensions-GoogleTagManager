@@ -18,11 +18,18 @@
  */
 namespace MediaWiki\Extension\GoogleTagManager;
 
+use MediaWiki\MediaWikiServices;
 use OutputPage;
 use Skin;
 use Title;
 
 class Hooks {
+	const EXTENSION_NAME = 'GoogleTagManager';
+	/**
+	 * @var \Config
+	 */
+	private static $config;
+
 	/**
 	 * BeforePageDisplay hook handler
 	 * @see https://www.mediawiki.org/wiki/Manual:Hooks/BeforePageDisplay
@@ -51,6 +58,7 @@ SCRIPT;
 		$script .= PHP_EOL;
 
 		$out->addHeadItem( 'GoogleTagManager', $script );
+		$out->addModules( 'ext.googleTagManager.eventTracking' );
 	}
 
 	/**
@@ -72,6 +80,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 SCRIPT;
 		}
+	}
+
+	/**
+	 * Hook: ResourceLoaderGetConfigVars called right before
+	 * ResourceLoaderStartUpModule::getConfig returns
+	 *
+	 * @see https://www.mediawiki.org/wiki/Manual:Hooks/ResourceLoaderGetConfigVars
+	 *
+	 * @param array &$vars array of variables to be added into the output of the startup module.
+	 */
+	public static function onResourceLoaderGetConfigVars( &$vars ) {
+		$vars['wgGoogleTagManagerConfig'] = [
+			'MediaWikiEvents' => self::getConfigVar( 'MediaWikiEvents' )
+		];
 	}
 
 	private static function isDisabled( OutputPage $out ) {
@@ -118,5 +140,20 @@ SCRIPT;
 		}
 
 		return PHP_EOL . '<!-- ' . wfMessage( $messageName )->text() . ' -->' . PHP_EOL;
+	}
+
+	/**
+	 * @param string $name
+	 *
+	 * @return \Config
+	 * @throws \ConfigException
+	 */
+	protected static function getConfigVar( $name ) {
+		if ( !isset( self::$config ) ) {
+			self::$config = MediaWikiServices::getInstance()->getConfigFactory()
+							->makeConfig( strtolower( self::EXTENSION_NAME ) );
+		}
+
+		return self::$config->get( self::EXTENSION_NAME . $name );
 	}
 }

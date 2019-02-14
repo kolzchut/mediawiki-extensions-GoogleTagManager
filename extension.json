@@ -1,6 +1,6 @@
 {
 	"name": "GoogleTagManager",
-	"version": "0.2.0",
+	"version": "0.3.0",
 	"author": [
 		"Dror S. [FFS] ([https://www.kolzchut.org.il Kol-Zchut])"
 	],
@@ -23,7 +23,11 @@
 	},
 	"Hooks": {
 		"SkinHelenaBodyStart": "MediaWiki\\Extension\\GoogleTagManager\\Hooks::onSkinHelenaBodyStart",
-		"BeforePageDisplay": "MediaWiki\\Extension\\GoogleTagManager\\Hooks::onBeforePageDisplay"
+		"BeforePageDisplay": "MediaWiki\\Extension\\GoogleTagManager\\Hooks::onBeforePageDisplay",
+		"ResourceLoaderGetConfigVars": "MediaWiki\\Extension\\GoogleTagManager\\Hooks::onResourceLoaderGetConfigVars"
+	},
+	"ConfigRegistry": {
+		"googletagmanager": "GlobalVarConfig::newInstance"
 	},
 	"config": {
 		"GoogleTagManagerContainerID": {
@@ -42,7 +46,21 @@
 				"Preferences",
 				"ChangePassword"
 			]
+		},
+		"GoogleTagManagerMediaWikiEvents": {
+			"value": []
 		}
+	},
+	"ResourceModules": {
+		"ext.googleTagManager.eventTracking": {
+			"scripts": [
+				"ext.googleTagManager.eventTracking.js"
+			]
+		}
+	},
+	"ResourceFileModulePaths": {
+		"localBasePath": "resources",
+		"remoteExtPath": "GoogleTagManager/resources"
 	},
 	"manifest_version": 2
 }
