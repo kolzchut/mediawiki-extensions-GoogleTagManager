@@ -13,11 +13,11 @@ as it requires the skin's unique hook for after-<body> code insertion
 | Variable                                           | Value | Explanation
 |----------------------------------------------------|-------|-------------------
 | $wgGoogleTagManagerContainerID                     | null  | Container ID or array of IDs
-| $GoogleTagManagerMediaWikiEvents                   | []    | an array of MediaWiki event names, subscribed through mw.trackEvent(). Events will be pushed as-is to the dataLayer - an `event` name + a `eventData` object.
+| $wgGoogleTagManagerMediaWikiEvents                 | []    | an array of MediaWiki event names, subscribed through mw.trackEvent(). Events will be pushed as-is to the dataLayer - an `event` name + a `eventData` object.
 
 ### Exemption from tracking
 Users with the "noanalytics" right are exempt from tracking, and this will not be
-loaded for them. By default only bots have this right.
+loaded for them. By default, only bots have this right.
 
 ## Changelog ##
 ### 0.4.0
