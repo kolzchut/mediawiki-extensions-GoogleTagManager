@@ -10,6 +10,10 @@
 			} );
 		},
 		sendMediaWikiEvent: function ( topic, data ) {
+			// Make sure the following are defined, or the dataLayer will keep previous values
+			[ 'action', 'label', 'value' ].forEach( function ( val ) {
+				data[ val ] = data[ val ] || null;
+			} );
 			window.dataLayer.push( {
 				event: topic,
 				eventData: data
