@@ -18,6 +18,7 @@
  */
 namespace MediaWiki\Extension\GoogleTagManager;
 
+use Exception;
 use MediaWiki\MediaWikiServices;
 use OutputPage;
 use Skin;
