@@ -46,6 +46,7 @@ class Hooks {
 		if ( $script === false ) {
 			/* Else: we load the script */
 			$script = '';
+			$noscript = '';
 
 			// Cast into array, if it's not that already
 			$wgGoogleTagManagerContainerID = (array) $wgGoogleTagManagerContainerID;
@@ -61,37 +62,20 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager ({$id}) -->
 SCRIPT;
 				$script .= PHP_EOL;
-			}
-		}
 
-		$out->addHeadItem( 'GoogleTagManager', $script );
-		$out->addModules( 'ext.googleTagManager.eventTracking' );
-	}
-
-	/**
-	 * SkinHelenaBodyStart hook handler
-	 * This hook is part of Skin:Helena.
-	 *
-	 * @param Skin $skin
-	 */
-	public static function onSkinHelenaBodyStart( Skin $skin ) {
-		global $wgGoogleTagManagerContainerID;
-
-		/* Check if disabled for site / user / page */
-		$isDisabledReason = self::isDisabled( $skin->getOutput() );
-		if ( $isDisabledReason === false ) {
-			// Cast into array, if it's not that already
-			$wgGoogleTagManagerContainerID = (array) $wgGoogleTagManagerContainerID;
-			foreach ( $wgGoogleTagManagerContainerID as $id ) {
-				echo <<<SCRIPT
+				$noscript .= <<<SCRIPT
 <!-- Google Tag Manager (noscript) - ID {$id} -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={$id}"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 SCRIPT;
-				echo PHP_EOL;
+				$noscript .= PHP_EOL;
 			}
 		}
+
+		$out->addHeadItem( 'GoogleTagManager', $script );
+		$out->addHTML( $noscript );
+		$out->addModules( 'ext.googleTagManager.eventTracking' );
 	}
 
 	/**

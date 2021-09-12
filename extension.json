@@ -22,7 +22,6 @@
 		"MediaWiki\\Extension\\GoogleTagManager\\Hooks": "includes/Hooks.php"
 	},
 	"Hooks": {
-		"SkinHelenaBodyStart": "MediaWiki\\Extension\\GoogleTagManager\\Hooks::onSkinHelenaBodyStart",
 		"BeforePageDisplay": "MediaWiki\\Extension\\GoogleTagManager\\Hooks::onBeforePageDisplay",
 		"ResourceLoaderGetConfigVars": "MediaWiki\\Extension\\GoogleTagManager\\Hooks::onResourceLoaderGetConfigVars"
 	},
