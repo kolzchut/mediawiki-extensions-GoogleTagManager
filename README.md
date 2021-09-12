@@ -23,6 +23,9 @@ Users with the "noanalytics" right are exempt from tracking, and this will not b
 loaded for them. By default, only bots have this right.
 
 ## Changelog ##
+### 0.5.0
+- Add the <noscript> parts using onBeforePageDisplay() and not a custom hook
+
 ### 0.4.0
 - $wgGoogleTagManagerContainerID can now contain an array of IDs
 
