@@ -75,7 +75,10 @@ SCRIPT;
 
 		$out->addHeadItem( 'GoogleTagManager', $script );
 		$out->addHTML( $noscript );
-		$out->addModules( 'ext.googleTagManager.eventTracking' );
+
+		if ( !empty( self::getConfigVar( 'MediaWikiEvents' ) ) ) {
+			$out->addModules( 'ext.googleTagManager.eventTracking' );
+		}
 	}
 
 	/**
