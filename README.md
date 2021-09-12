@@ -14,6 +14,9 @@ as it requires the skin's unique hook for after-<body> code insertion
 |----------------------------------------------------|-------|-------------------
 | $wgGoogleTagManagerContainerID                     | null  | Container ID or array of IDs
 | $wgGoogleTagManagerMediaWikiEvents                 | []    | an array of MediaWiki event names, subscribed through mw.trackEvent(). Events will be pushed as-is to the dataLayer - an `event` name + a `eventData` object.
+| $wgGoogleTagManagerIgnoreNsIDs                     | []    | An array of namespaces not to load Tag Manager in, e.g. `[ NS_FILE, NS_PROJECT ]`
+| $wgGoogleTagManagerIgnorePages                     | []    | An array of page names no to load Tag Manager in
+| $wgGoogleTagManagerIgnoreSpecials                  | `['Userlogin', 'Userlogout', 'Preferences', 'ChangePassword']`      | An array of __special__ pages not to load Tag Manager in  
 
 ### Exemption from tracking
 Users with the "noanalytics" right are exempt from tracking, and this will not be
