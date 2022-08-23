@@ -1,12 +1,12 @@
 {
-    "@metadata": {
-        "authors": [
+	"@metadata": {
+		"authors": [
 			"Dror S [FFS]"
-        ]
-    },
-    "googletagmanager-desc": "Inserts the Google Tag Manager script",
-    "right-noanalytics": "Exempted from web analytics tracking of any kind",
-    "googletagmanager-disabled-for-user": "Tracking is disabled for this user",
-    "googletagmanager-disabled-for-page": "Tracking is disabled on this page",
-    "googletagmanager-error-not-configured": "Error: you must set $wgGoogleTagManagerContainerID to your Google Tag Manager container ID."
+		]
+	},
+	"googletagmanager-desc": "Inserts the Google Tag Manager script",
+	"right-noanalytics": "Exempted from web analytics tracking of any kind",
+	"googletagmanager-disabled-for-user": "Tracking is disabled for this user",
+	"googletagmanager-disabled-for-page": "Tracking is disabled on this page",
+	"googletagmanager-error-not-configured": "Error: you must set $wgGoogleTagManagerContainerID to your Google Tag Manager container ID."
 }

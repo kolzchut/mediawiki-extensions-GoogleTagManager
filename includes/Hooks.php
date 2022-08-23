@@ -18,6 +18,7 @@
  */
 namespace MediaWiki\Extension\GoogleTagManager;
 
+use Config;
 use Exception;
 use MediaWiki\MediaWikiServices;
 use OutputPage;
@@ -25,11 +26,11 @@ use Skin;
 use Title;
 
 class Hooks {
-	const EXTENSION_NAME = 'GoogleTagManager';
+	private const EXTENSION_NAME = 'GoogleTagManager';
 	/**
-	 * @var \Config
+	 * @var Config
 	 */
-	private static $config;
+	private static Config $config;
 
 	/**
 	 * BeforePageDisplay hook handler
@@ -37,22 +38,25 @@ class Hooks {
 	 *
 	 * @param OutputPage &$out
 	 * @param Skin &$skin
+	 *
+	 * @throws Exception
 	 */
 	public static function onBeforePageDisplay( OutputPage &$out, Skin &$skin ) {
 		global $wgGoogleTagManagerContainerID;
 
 		/* Check if disabled for site / user / page */
-		$script = self::isDisabled( $out );
-		if ( $script === false ) {
-			/* Else: we load the script */
-			$script = '';
-			$noscript = '';
+		if ( self::isDisabled( $out ) ) {
+			return;
+		}
 
-			// Cast into array, if it's not that already
-			$wgGoogleTagManagerContainerID = (array) $wgGoogleTagManagerContainerID;
-			foreach ( $wgGoogleTagManagerContainerID as $id ) {
+		$script = '';
+		$noscript = '';
 
-				$script .= <<<SCRIPT
+		// Cast into array, if it's not that already
+		$wgGoogleTagManagerContainerID = (array)$wgGoogleTagManagerContainerID;
+		foreach ( $wgGoogleTagManagerContainerID as $id ) {
+
+			$script .= <<<SCRIPT
 <!-- Google Tag Manager - ID {$id} -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -61,16 +65,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','{$id}');</script>
 <!-- End Google Tag Manager ({$id}) -->
 SCRIPT;
-				$script .= PHP_EOL;
+			$script .= PHP_EOL;
 
-				$noscript .= <<<SCRIPT
+			$noscript .= <<<SCRIPT
 <!-- Google Tag Manager (noscript) - ID {$id} -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={$id}"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 SCRIPT;
-				$noscript .= PHP_EOL;
-			}
+			$noscript .= PHP_EOL;
 		}
 
 		$out->addHeadItem( 'GoogleTagManager', $script );
@@ -95,10 +98,16 @@ SCRIPT;
 		];
 	}
 
+	/**
+	 * @param OutputPage $out
+	 *
+	 * @return false|string
+	 * @throws Exception
+	 */
 	private static function isDisabled( OutputPage $out ) {
 		global $wgGoogleTagManagerContainerID;
 
-		if ( is_null( $wgGoogleTagManagerContainerID ) ) {
+		if ( $wgGoogleTagManagerContainerID === null ) {
 			return self::messageToComment( 'googletagmanager-error-not-configured' );
 		}
 		if ( $out->getUser()->isAllowed( 'noanalytics' ) ) {
@@ -111,13 +120,18 @@ SCRIPT;
 		return false;
 	}
 
-	private static function isIgnoredPage( Title $title ) {
+	/**
+	 * @param Title $title
+	 *
+	 * @return bool
+	 */
+	private static function isIgnoredPage( Title $title ): bool {
 		global $wgGoogleTagManagerIgnoreNsIDs,
 			   $wgGoogleTagManagerIgnorePages,
 			   $wgGoogleTagManagerIgnoreSpecials;
 
 		$ignoreSpecials = count( array_filter( $wgGoogleTagManagerIgnoreSpecials,
-				function ( $v ) use ( $title ) {
+				static function ( $v ) use ( $title ) {
 					return $title->isSpecial( $v );
 				} ) ) > 0;
 
@@ -132,10 +146,11 @@ SCRIPT;
 	 * @param string $messageName
 	 *
 	 * @return string
+	 * @throws Exception
 	 */
-	protected static function messageToComment( $messageName = '' ) {
+	protected static function messageToComment( string $messageName = '' ): string {
 		if ( empty( $messageName ) ) {
-			( new Exception( 'missing a message name!' ) );
+			throw new \MWException( 'missing a message name!' );
 		}
 
 		return PHP_EOL . '<!-- ' . wfMessage( $messageName )->text() . ' -->' . PHP_EOL;
@@ -144,10 +159,10 @@ SCRIPT;
 	/**
 	 * @param string $name
 	 *
-	 * @return \Config
+	 * @return mixed
 	 * @throws \ConfigException
 	 */
-	protected static function getConfigVar( $name ) {
+	protected static function getConfigVar( string $name ) {
 		if ( !isset( self::$config ) ) {
 			self::$config = MediaWikiServices::getInstance()->getConfigFactory()
 							->makeConfig( strtolower( self::EXTENSION_NAME ) );
