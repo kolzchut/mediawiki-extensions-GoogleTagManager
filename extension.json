@@ -1,6 +1,6 @@
 {
 	"name": "GoogleTagManager",
-	"version": "0.5.0",
+	"version": "0.6.0",
 	"author": [
 		"Dror S. [FFS] ([https://www.kolzchut.org.il Kol-Zchut])"
 	],
@@ -18,8 +18,8 @@
 			"i18n"
 		]
 	},
-	"AutoloadClasses": {
-		"MediaWiki\\Extension\\GoogleTagManager\\Hooks": "includes/Hooks.php"
+	"AutoloadNamespaces": {
+		"MediaWiki\\Extension\\GoogleTagManager\\": "includes/"
 	},
 	"Hooks": {
 		"BeforePageDisplay": "MediaWiki\\Extension\\GoogleTagManager\\Hooks::onBeforePageDisplay",

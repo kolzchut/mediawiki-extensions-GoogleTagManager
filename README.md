@@ -22,7 +22,14 @@ as it requires the skin's unique hook for after-<body> code insertion
 Users with the "noanalytics" right are exempt from tracking, and this will not be
 loaded for them. By default, only bots have this right.
 
+## Extending the data layer
+The extension defines a new hook, `DataLayerSetup`, which allows other extensions to add to the data layer.
+See file `includes/Hooks/DataLayerSetupHook` for details.
+
 ## Changelog ##
+### 0.6.0
+- Add a new hook, DataLayerSetup, which allows other extensions to add to the data layer.
+
 ### 0.5.0
 - Add the <noscript> parts using onBeforePageDisplay() and not a custom hook
 
