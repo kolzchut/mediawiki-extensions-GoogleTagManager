@@ -8,8 +8,7 @@ use MediaWiki\HookContainer\HookContainer;
  * This is a hook runner class, see docs/Hooks.md in core.
  * @internal
  */
-class HookRunner implements	DataLayerSetupHook
-{
+class HookRunner implements	DataLayerSetupHook {
 	private HookContainer $hookContainer;
 
 	public function __construct( HookContainer $hookContainer ) {

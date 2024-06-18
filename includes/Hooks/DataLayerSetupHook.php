@@ -2,13 +2,12 @@
 
 namespace MediaWiki\Extension\GoogleTagManager\Hooks;
 
-
 use OutputPage;
 use Skin;
 
 /**
-* @ingroup Hooks
-*/
+ * @ingroup Hooks
+ */
 
 interface DataLayerSetupHook {
 

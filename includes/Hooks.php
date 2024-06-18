@@ -50,7 +50,8 @@ class Hooks {
 		}
 
 		$dataLayerArray = [];
-		(new Hooks\HookRunner(MediaWikiServices::getInstance()->getHookContainer()))->onDataLayerSetup( $out, $skin, $dataLayerArray );
+		$hookContainer = MediaWikiServices::getInstance()->getHookContainer();
+		( new Hooks\HookRunner( $hookContainer ) )->onDataLayerSetup( $out, $skin, $dataLayerArray );
 		$dataLayerScript = '<script>window.dataLayer = window.dataLayer || [];';
 		if ( !empty( $dataLayerArray ) ) {
 			$dataLayerScript .= 'window.dataLayer.push( ' . json_encode( $dataLayerArray ) . ' );';
