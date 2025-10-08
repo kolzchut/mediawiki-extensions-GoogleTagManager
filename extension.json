@@ -1,6 +1,6 @@
 {
 	"name": "GoogleTagManager",
-	"version": "0.6.0",
+	"version": "0.7.0",
 	"author": [
 		"Dror S. [FFS] ([https://www.kolzchut.org.il Kol-Zchut])"
 	],
@@ -56,6 +56,16 @@
 				"ext.googleTagManager.eventTracking.js"
 			]
 		}
+	},
+	"QUnitTestModule": {
+		"localBasePath": "tests/qunit/",
+		"remoteExtPath": "GoogleTagManager/tests/qunit/",
+		"scripts": [
+			"ext.googleTagManager.eventTracking.test.js"
+		],
+		"dependencies": [
+			"ext.googleTagManager.eventTracking"
+		]
 	},
 	"ResourceFileModulePaths": {
 		"localBasePath": "resources",
