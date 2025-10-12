@@ -230,6 +230,41 @@
 		assert.strictEqual( ts.resolveRenamedTopic( 'survey.user.profile' ), 'profile', 'Exact match with longest prefix' );
 	} );
 
+	QUnit.test( 'resolveRenamedTopic with dash separator replacement', function ( assert ) {
+		var ts = mw.googleTagManager.trackSearch;
+		ts.renames = {
+			'cassandra.tabs': 'tabs-',
+			'survey.user': 'user-survey-'
+		};
+
+		assert.strictEqual( ts.resolveRenamedTopic( 'cassandra.tabs.open' ), 'tabs-open', 'Replaces dot with dash when rename ends with dash' );
+		assert.strictEqual( ts.resolveRenamedTopic( 'cassandra.tabs.close' ), 'tabs-close', 'Replaces dot with dash when rename ends with dash' );
+		assert.strictEqual( ts.resolveRenamedTopic( 'survey.user.profile.view' ), 'user-survey-profile-view', 'Replaces dots with dashes in multi-level events' );
+		assert.strictEqual( ts.resolveRenamedTopic( 'cassandra.tabs' ), 'tabs-', 'Exact match returns rename as-is' );
+	} );
+
+	QUnit.test( 'resolveRenamedTopic with underscore separator replacement', function ( assert ) {
+		var ts = mw.googleTagManager.trackSearch;
+		ts.renames = {
+			'analytics.events': 'events_',
+			'user.actions': 'actions_'
+		};
+
+		assert.strictEqual( ts.resolveRenamedTopic( 'analytics.events.click' ), 'events_click', 'Replaces dot with underscore when rename ends with underscore' );
+		assert.strictEqual( ts.resolveRenamedTopic( 'user.actions.submit.form' ), 'actions_submit_form', 'Replaces dots with underscores in multi-level events' );
+	} );
+
+	QUnit.test( 'resolveRenamedTopic preserves dots when rename does not end with separator', function ( assert ) {
+		var ts = mw.googleTagManager.trackSearch;
+		ts.renames = {
+			survey: 'hello',
+			user: 'person'
+		};
+
+		assert.strictEqual( ts.resolveRenamedTopic( 'survey.started' ), 'hello.started', 'Preserves dot when rename does not end with separator' );
+		assert.strictEqual( ts.resolveRenamedTopic( 'user.profile' ), 'person.profile', 'Preserves dot when rename does not end with separator' );
+	} );
+
 	QUnit.test( 'sendMediaWikiEvent with no renames', function ( assert ) {
 		var ts = mw.googleTagManager.trackSearch;
 		ts.renames = {};
@@ -359,5 +394,32 @@
 		this.subscriptions.survey( 'survey.accepted', { test: true } );
 
 		assert.strictEqual( window.dataLayer[ 0 ].event, 'accepted', 'Most specific rename wins over prefix' );
+	} );
+
+	QUnit.test( 'Integration test: dash separator replacement', function ( assert ) {
+		var ts = mw.googleTagManager.trackSearch;
+		var config = {
+			'cassandra.tabs': 'tabs-',
+			'analytics.events': 'events_',
+			'user.profile': 'profile'
+		};
+
+		ts.registerMediaWikiEvents( config );
+
+		// Simulate events with dash separator
+		this.subscriptions[ 'cassandra.tabs' ]( 'cassandra.tabs.open', { action: 'open' } );
+		this.subscriptions[ 'cassandra.tabs' ]( 'cassandra.tabs.close', { action: 'close' } );
+
+		// Simulate events with underscore separator
+		this.subscriptions[ 'analytics.events' ]( 'analytics.events.click', { value: 1 } );
+
+		// Simulate events with dot preservation
+		this.subscriptions[ 'user.profile' ]( 'user.profile.view', { userId: 123 } );
+
+		assert.strictEqual( window.dataLayer.length, 4, 'Four events in dataLayer' );
+		assert.strictEqual( window.dataLayer[ 0 ].event, 'tabs-open', 'Dash separator applied to first event' );
+		assert.strictEqual( window.dataLayer[ 1 ].event, 'tabs-close', 'Dash separator applied to second event' );
+		assert.strictEqual( window.dataLayer[ 2 ].event, 'events_click', 'Underscore separator applied' );
+		assert.strictEqual( window.dataLayer[ 3 ].event, 'profile.view', 'Dot preserved when rename does not end with separator' );
 	} );
 }() );

@@ -6,9 +6,10 @@
 		config: [],
 		renames: {},
 		registerMediaWikiEvents: function ( eventsConfig ) {
-			var prepared = ts.prepareSubscriptions( eventsConfig );
+			var i,
+				prepared = ts.prepareSubscriptions( eventsConfig );
+
 			ts.renames = prepared.renames;
-			var i;
 			for ( i = 0; i < prepared.subscriptions.length; i++ ) {
 				mw.trackSubscribe( prepared.subscriptions[ i ], ts.sendMediaWikiEvent );
 			}
@@ -86,7 +87,16 @@
 			} );
 			if ( bestKey ) {
 				var remainder = topic.slice( bestKey.length ); // '' or '.suffix'
-				return ts.renames[ bestKey ] + remainder;
+				var renamed = ts.renames[ bestKey ];
+				// If renamed ends with a separator (-, _) and remainder starts with '.',
+				// replace all dots with the separator
+				if ( remainder.charAt( 0 ) === '.' && /[-_]$/.test( renamed ) ) {
+					var separator = renamed.charAt( renamed.length - 1 );
+					// Remove trailing separator from renamed, replace all dots in remainder
+					renamed = renamed.slice( 0, -1 );
+					remainder = remainder.replace( /\./g, separator );
+				}
+				return renamed + remainder;
 			}
 			return topic;
 		},
