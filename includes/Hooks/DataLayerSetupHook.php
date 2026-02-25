@@ -8,7 +8,6 @@ use Skin;
 /**
  * @ingroup Hooks
  */
-
 interface DataLayerSetupHook {
 
 	/**
@@ -19,5 +18,5 @@ interface DataLayerSetupHook {
 	 * @param array &$dataLayer
 	 * @return void
 	 */
-	public function onDataLayerSetup( OutputPage $output, Skin $skin, array &$dataLayer );
+	public function onDataLayerSetup( OutputPage $output, Skin $skin, array &$dataLayer ): void;
 }

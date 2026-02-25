@@ -1,22 +1,19 @@
 ( function () {
-	var ts;
-
 	mw.googleTagManager = mw.googleTagManager || {};
-	ts = mw.googleTagManager.trackSearch = {
+	const ts = mw.googleTagManager.trackSearch = {
 		config: [],
 		renames: {},
 		registerMediaWikiEvents: function ( eventsConfig ) {
-			var i,
-				prepared = ts.prepareSubscriptions( eventsConfig );
+			const prepared = ts.prepareSubscriptions( eventsConfig );
 
 			ts.renames = prepared.renames;
-			for ( i = 0; i < prepared.subscriptions.length; i++ ) {
+			for ( let i = 0; i < prepared.subscriptions.length; i++ ) {
 				mw.trackSubscribe( prepared.subscriptions[ i ], ts.sendMediaWikiEvent );
 			}
 		},
 		prepareSubscriptions: function ( eventsConfig ) {
-			var subscriptionsSet = Object.create( null );
-			var renames = {};
+			const subscriptionsSet = Object.create( null );
+			const renames = {};
 
 			function isNumericLikeKey( key ) {
 				return /^\d+$/.test( key );
@@ -28,14 +25,14 @@
 
 			if ( Array.isArray( eventsConfig ) ) {
 				// Simple list of event names (topics), pass-through
-				eventsConfig.forEach( function ( name ) {
+				eventsConfig.forEach( ( name ) => {
 					if ( isValidValue( name ) ) {
 						subscriptionsSet[ name ] = true;
 					}
 				} );
 			} else if ( eventsConfig && typeof eventsConfig === 'object' ) {
-				Object.keys( eventsConfig ).forEach( function ( key ) {
-					var val = eventsConfig[ key ];
+				Object.keys( eventsConfig ).forEach( ( key ) => {
+					const val = eventsConfig[ key ];
 					if ( isNumericLikeKey( key ) ) {
 						// Value is a topic to subscribe to as-is (from PHP mixed arrays)
 						if ( isValidValue( val ) ) {
@@ -56,9 +53,9 @@
 				} );
 
 				// Warn if a topic and one of its sub-events are both renamed
-				var keys = Object.keys( renames );
-				keys.forEach( function ( a ) {
-					keys.forEach( function ( b ) {
+				const keys = Object.keys( renames );
+				keys.forEach( ( a ) => {
+					keys.forEach( ( b ) => {
 						if ( a === b ) {
 							return;
 						}
@@ -77,8 +74,8 @@
 				return ts.renames[ topic ];
 			}
 			// Longest prefix (on dot boundary) wins
-			var bestKey = null;
-			Object.keys( ts.renames ).forEach( function ( key ) {
+			let bestKey = null;
+			Object.keys( ts.renames ).forEach( ( key ) => {
 				if ( topic.indexOf( key ) === 0 && ( topic.length === key.length || topic.charAt( key.length ) === '.' ) ) {
 					if ( bestKey === null || key.length > bestKey.length ) {
 						bestKey = key;
@@ -86,12 +83,12 @@
 				}
 			} );
 			if ( bestKey ) {
-				var remainder = topic.slice( bestKey.length ); // '' or '.suffix'
-				var renamed = ts.renames[ bestKey ];
+				let remainder = topic.slice( bestKey.length ); // '' or '.suffix'
+				let renamed = ts.renames[ bestKey ];
 				// If renamed ends with a separator (-, _) and remainder starts with '.',
 				// replace all dots with the separator
 				if ( remainder.charAt( 0 ) === '.' && /[-_]$/.test( renamed ) ) {
-					var separator = renamed.charAt( renamed.length - 1 );
+					const separator = renamed.charAt( renamed.length - 1 );
 					// Remove trailing separator from renamed, replace all dots in remainder
 					renamed = renamed.slice( 0, -1 );
 					remainder = remainder.replace( /\./g, separator );
@@ -104,10 +101,10 @@
 			// Ensure data is an object
 			data = data || {};
 			// Make sure the following are defined, or the dataLayer will keep previous values
-			[ 'action', 'label', 'value' ].forEach( function ( val ) {
+			[ 'action', 'label', 'value' ].forEach( ( val ) => {
 				data[ val ] = data[ val ] || null;
 			} );
-			var renamedTopic = ts.resolveRenamedTopic( topic );
+			const renamedTopic = ts.resolveRenamedTopic( topic );
 			window.dataLayer.push( {
 				event: renamedTopic,
 				eventData: data
@@ -118,7 +115,7 @@
 	function init() {
 		window.dataLayer = window.dataLayer || [];
 		ts.config = mw.config.get( 'wgGoogleTagManagerConfig' ) || {};
-		var eventsConfig = ts.config.MediaWikiEvents || [];
+		const eventsConfig = ts.config.MediaWikiEvents || [];
 		ts.registerMediaWikiEvents( eventsConfig );
 	}
 

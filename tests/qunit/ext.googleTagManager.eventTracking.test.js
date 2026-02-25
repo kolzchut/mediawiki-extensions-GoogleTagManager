@@ -37,7 +37,7 @@
 
 			// Mock mw.trackSubscribe to capture subscriptions
 			this.subscriptions = {};
-			var self = this;
+			const self = this;
 			mw.trackSubscribe = function ( topic, callback ) {
 				self.subscriptions[ topic ] = callback;
 			};
@@ -56,8 +56,8 @@
 		}
 	} ) );
 
-	QUnit.test( 'Constructor sanity test', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
+	QUnit.test( 'Constructor sanity test', ( assert ) => {
+		const ts = mw.googleTagManager.trackSearch;
 		assert.ok( ts, 'trackSearch object exists' );
 		assert.ok( typeof ts.registerMediaWikiEvents === 'function', 'registerMediaWikiEvents is a function' );
 		assert.ok( typeof ts.prepareSubscriptions === 'function', 'prepareSubscriptions is a function' );
@@ -65,9 +65,9 @@
 		assert.ok( typeof ts.sendMediaWikiEvent === 'function', 'sendMediaWikiEvent is a function' );
 	} );
 
-	QUnit.test( 'prepareSubscriptions with empty config', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
-		var result = ts.prepareSubscriptions( [] );
+	QUnit.test( 'prepareSubscriptions with empty config', ( assert ) => {
+		const ts = mw.googleTagManager.trackSearch;
+		let result = ts.prepareSubscriptions( [] );
 
 		assert.deepEqual( result.subscriptions, [], 'Empty array returns empty subscriptions' );
 		assert.deepEqual( result.renames, {}, 'Empty array returns empty renames' );
@@ -77,10 +77,10 @@
 		assert.deepEqual( result.renames, {}, 'Empty object returns empty renames' );
 	} );
 
-	QUnit.test( 'prepareSubscriptions with array config', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
-		var config = [ 'survey.accepted', 'survey.rejected', 'user.login' ];
-		var result = ts.prepareSubscriptions( config );
+	QUnit.test( 'prepareSubscriptions with array config', ( assert ) => {
+		const ts = mw.googleTagManager.trackSearch;
+		const config = [ 'survey.accepted', 'survey.rejected', 'user.login' ];
+		const result = ts.prepareSubscriptions( config );
 
 		assert.deepEqual(
 			result.subscriptions.sort(),
@@ -90,14 +90,14 @@
 		assert.deepEqual( result.renames, {}, 'Array config has no renames' );
 	} );
 
-	QUnit.test( 'prepareSubscriptions with mapping config', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
-		var config = {
+	QUnit.test( 'prepareSubscriptions with mapping config', ( assert ) => {
+		const ts = mw.googleTagManager.trackSearch;
+		const config = {
 			'survey.accepted': 'survey-accepted',
 			'survey.rejected': 'survey-rejected',
 			'user.login': 'user-login'
 		};
-		var result = ts.prepareSubscriptions( config );
+		const result = ts.prepareSubscriptions( config );
 
 		assert.deepEqual(
 			result.subscriptions.sort(),
@@ -111,15 +111,15 @@
 		}, 'Mapping values become renames' );
 	} );
 
-	QUnit.test( 'prepareSubscriptions with mixed array/mapping (PHP-style)', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
-		var config = {
+	QUnit.test( 'prepareSubscriptions with mixed array/mapping (PHP-style)', ( assert ) => {
+		const ts = mw.googleTagManager.trackSearch;
+		const config = {
 			0: 'plain.event',
 			1: 'another.event',
 			'survey.accepted': 'survey-accepted',
 			'user.login': 'user-login'
 		};
-		var result = ts.prepareSubscriptions( config );
+		const result = ts.prepareSubscriptions( config );
 
 		assert.deepEqual(
 			result.subscriptions.sort(),
@@ -132,9 +132,9 @@
 		}, 'Only non-numeric keys get rename mappings' );
 	} );
 
-	QUnit.test( 'prepareSubscriptions filters invalid entries', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
-		var config = {
+	QUnit.test( 'prepareSubscriptions filters invalid entries', ( assert ) => {
+		const ts = mw.googleTagManager.trackSearch;
+		const config = {
 			'valid.event': 'valid-event',
 			'': 'empty-key',
 			'null.value': null,
@@ -144,7 +144,7 @@
 			1: null,
 			2: 'valid.numeric'
 		};
-		var result = ts.prepareSubscriptions( config );
+		const result = ts.prepareSubscriptions( config );
 
 		assert.deepEqual(
 			result.subscriptions.sort(),
@@ -157,8 +157,8 @@
 	} );
 
 	QUnit.test( 'prepareSubscriptions warns on conflicting renames', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
-		var config = {
+		const ts = mw.googleTagManager.trackSearch;
+		const config = {
 			survey: 'hello',
 			'survey.accepted': 'survey-accepted',
 			'survey.rejected': 'survey-rejected',
@@ -170,27 +170,23 @@
 
 		assert.ok( this.warnings.length > 0, 'Warnings were generated' );
 
-		var surveyWarnings = this.warnings.filter( function ( warning ) {
-			return warning.indexOf( 'survey' ) !== -1 && warning.indexOf( 'conflicting rename rules' ) !== -1;
-		} );
-		var userWarnings = this.warnings.filter( function ( warning ) {
-			return warning.indexOf( 'user' ) !== -1 && warning.indexOf( 'conflicting rename rules' ) !== -1;
-		} );
+		const surveyWarnings = this.warnings.filter( ( warning ) => warning.includes( 'survey' ) && warning.includes( 'conflicting rename rules' ) );
+		const userWarnings = this.warnings.filter( ( warning ) => warning.includes( 'user' ) && warning.includes( 'conflicting rename rules' ) );
 
 		assert.ok( surveyWarnings.length > 0, 'Warning generated for survey conflicts' );
 		assert.ok( userWarnings.length > 0, 'Warning generated for user conflicts' );
 	} );
 
-	QUnit.test( 'resolveRenamedTopic with no renames', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
+	QUnit.test( 'resolveRenamedTopic with no renames', ( assert ) => {
+		const ts = mw.googleTagManager.trackSearch;
 		ts.renames = {};
 
 		assert.strictEqual( ts.resolveRenamedTopic( 'survey.accepted' ), 'survey.accepted', 'Returns original topic when no renames' );
 		assert.strictEqual( ts.resolveRenamedTopic( 'user.login' ), 'user.login', 'Returns original topic when no renames' );
 	} );
 
-	QUnit.test( 'resolveRenamedTopic with exact match', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
+	QUnit.test( 'resolveRenamedTopic with exact match', ( assert ) => {
+		const ts = mw.googleTagManager.trackSearch;
 		ts.renames = {
 			'survey.accepted': 'survey-accepted',
 			'user.login': 'user-login'
@@ -201,8 +197,8 @@
 		assert.strictEqual( ts.resolveRenamedTopic( 'other.event' ), 'other.event', 'Returns original when no match' );
 	} );
 
-	QUnit.test( 'resolveRenamedTopic with prefix match', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
+	QUnit.test( 'resolveRenamedTopic with prefix match', ( assert ) => {
+		const ts = mw.googleTagManager.trackSearch;
 		ts.renames = {
 			survey: 'hello',
 			user: 'person'
@@ -216,8 +212,8 @@
 		assert.strictEqual( ts.resolveRenamedTopic( 'other.survey' ), 'other.survey', 'Does not match suffix' );
 	} );
 
-	QUnit.test( 'resolveRenamedTopic with longest prefix wins', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
+	QUnit.test( 'resolveRenamedTopic with longest prefix wins', ( assert ) => {
+		const ts = mw.googleTagManager.trackSearch;
 		ts.renames = {
 			survey: 'hello',
 			'survey.user': 'user-survey',
@@ -230,8 +226,8 @@
 		assert.strictEqual( ts.resolveRenamedTopic( 'survey.user.profile' ), 'profile', 'Exact match with longest prefix' );
 	} );
 
-	QUnit.test( 'resolveRenamedTopic with dash separator replacement', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
+	QUnit.test( 'resolveRenamedTopic with dash separator replacement', ( assert ) => {
+		const ts = mw.googleTagManager.trackSearch;
 		ts.renames = {
 			'cassandra.tabs': 'tabs-',
 			'survey.user': 'user-survey-'
@@ -243,8 +239,8 @@
 		assert.strictEqual( ts.resolveRenamedTopic( 'cassandra.tabs' ), 'tabs-', 'Exact match returns rename as-is' );
 	} );
 
-	QUnit.test( 'resolveRenamedTopic with underscore separator replacement', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
+	QUnit.test( 'resolveRenamedTopic with underscore separator replacement', ( assert ) => {
+		const ts = mw.googleTagManager.trackSearch;
 		ts.renames = {
 			'analytics.events': 'events_',
 			'user.actions': 'actions_'
@@ -254,8 +250,8 @@
 		assert.strictEqual( ts.resolveRenamedTopic( 'user.actions.submit.form' ), 'actions_submit_form', 'Replaces dots with underscores in multi-level events' );
 	} );
 
-	QUnit.test( 'resolveRenamedTopic preserves dots when rename does not end with separator', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
+	QUnit.test( 'resolveRenamedTopic preserves dots when rename does not end with separator', ( assert ) => {
+		const ts = mw.googleTagManager.trackSearch;
 		ts.renames = {
 			survey: 'hello',
 			user: 'person'
@@ -265,8 +261,8 @@
 		assert.strictEqual( ts.resolveRenamedTopic( 'user.profile' ), 'person.profile', 'Preserves dot when rename does not end with separator' );
 	} );
 
-	QUnit.test( 'sendMediaWikiEvent with no renames', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
+	QUnit.test( 'sendMediaWikiEvent with no renames', ( assert ) => {
+		const ts = mw.googleTagManager.trackSearch;
 		ts.renames = {};
 
 		ts.sendMediaWikiEvent( 'survey.accepted', { value: 5, action: 'click' } );
@@ -278,8 +274,8 @@
 		assert.strictEqual( window.dataLayer[ 0 ].eventData.label, null, 'Default null value set' );
 	} );
 
-	QUnit.test( 'sendMediaWikiEvent with exact rename', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
+	QUnit.test( 'sendMediaWikiEvent with exact rename', ( assert ) => {
+		const ts = mw.googleTagManager.trackSearch;
 		ts.renames = {
 			'survey.accepted': 'survey-accepted'
 		};
@@ -290,8 +286,8 @@
 		assert.strictEqual( window.dataLayer[ 0 ].eventData.value, 10, 'Event data preserved' );
 	} );
 
-	QUnit.test( 'sendMediaWikiEvent with prefix rename', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
+	QUnit.test( 'sendMediaWikiEvent with prefix rename', ( assert ) => {
+		const ts = mw.googleTagManager.trackSearch;
 		ts.renames = {
 			survey: 'hello'
 		};
@@ -302,8 +298,8 @@
 		assert.strictEqual( window.dataLayer[ 0 ].eventData.action, 'begin', 'Event data preserved' );
 	} );
 
-	QUnit.test( 'sendMediaWikiEvent handles missing data', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
+	QUnit.test( 'sendMediaWikiEvent handles missing data', ( assert ) => {
+		const ts = mw.googleTagManager.trackSearch;
 		ts.renames = {};
 
 		ts.sendMediaWikiEvent( 'test.event' );
@@ -317,8 +313,8 @@
 	} );
 
 	QUnit.test( 'registerMediaWikiEvents subscribes to all topics', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
-		var config = {
+		const ts = mw.googleTagManager.trackSearch;
+		const config = {
 			survey: 'hello',
 			'survey.accepted': 'survey-accepted',
 			'user.login': 'user-login'
@@ -332,9 +328,9 @@
 		assert.strictEqual( Object.keys( this.subscriptions ).length, 3, 'Subscribed to exactly 3 topics' );
 	} );
 
-	QUnit.test( 'registerMediaWikiEvents stores renames', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
-		var config = {
+	QUnit.test( 'registerMediaWikiEvents stores renames', ( assert ) => {
+		const ts = mw.googleTagManager.trackSearch;
+		const config = {
 			survey: 'hello',
 			'user.login': 'user-login'
 		};
@@ -348,8 +344,8 @@
 	} );
 
 	QUnit.test( 'Integration test: complete event flow', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
-		var config = {
+		const ts = mw.googleTagManager.trackSearch;
+		const config = {
 			survey: 'hello',
 			'user.login': 'user-login',
 			0: 'plain.event'
@@ -377,8 +373,8 @@
 	} );
 
 	QUnit.test( 'Integration test: conflict detection in real usage', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
-		var config = {
+		const ts = mw.googleTagManager.trackSearch;
+		const config = {
 			survey: 'hello',
 			'survey.accepted': 'accepted',
 			'survey.rejected': 'rejected'
@@ -397,8 +393,8 @@
 	} );
 
 	QUnit.test( 'Integration test: dash separator replacement', function ( assert ) {
-		var ts = mw.googleTagManager.trackSearch;
-		var config = {
+		const ts = mw.googleTagManager.trackSearch;
+		const config = {
 			'cassandra.tabs': 'tabs-',
 			'analytics.events': 'events_',
 			'user.profile': 'profile'
