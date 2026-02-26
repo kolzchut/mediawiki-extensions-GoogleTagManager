@@ -3,6 +3,8 @@
 namespace MediaWiki\Extension\GoogleTagManager\Hooks;
 
 use MediaWiki\HookContainer\HookContainer;
+use MediaWiki\Output\OutputPage;
+use Skin;
 
 /**
  * This is a hook runner class, see docs/Hooks.md in core.
@@ -18,7 +20,7 @@ class HookRunner implements	DataLayerSetupHook {
 	/**
 	 * @inheritDoc
 	 */
-	public function onDataLayerSetup( \OutputPage $output, \Skin $skin, array &$dataLayer ) {
+	public function onDataLayerSetup( OutputPage $output, Skin $skin, array &$dataLayer ) {
 		return $this->hookContainer->run(
 			'DataLayerSetup',
 			[ $output, $skin, &$dataLayer ]

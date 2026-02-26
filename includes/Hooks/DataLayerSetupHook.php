@@ -2,7 +2,7 @@
 
 namespace MediaWiki\Extension\GoogleTagManager\Hooks;
 
-use OutputPage;
+use MediaWiki\Output\OutputPage;
 use Skin;
 
 /**
@@ -18,5 +18,5 @@ interface DataLayerSetupHook {
 	 * @param array &$dataLayer
 	 * @return void
 	 */
-	public function onDataLayerSetup( OutputPage $output, Skin $skin, array &$dataLayer ): void;
+	public function onDataLayerSetup( OutputPage $output, Skin $skin, array &$dataLayer );
 }

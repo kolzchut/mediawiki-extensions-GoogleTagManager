@@ -21,12 +21,18 @@
 	"AutoloadNamespaces": {
 		"MediaWiki\\Extension\\GoogleTagManager\\": "includes/"
 	},
-	"Hooks": {
-		"BeforePageDisplay": "MediaWiki\\Extension\\GoogleTagManager\\Hooks::onBeforePageDisplay",
-		"ResourceLoaderGetConfigVars": "MediaWiki\\Extension\\GoogleTagManager\\Hooks::onResourceLoaderGetConfigVars"
+	"HookHandlers": {
+		"main": {
+			"class": "MediaWiki\\Extension\\GoogleTagManager\\Hooks",
+			"services": [
+				"MainConfig",
+				"HookContainer"
+			]
+		}
 	},
-	"ConfigRegistry": {
-		"googletagmanager": "GlobalVarConfig::newInstance"
+	"Hooks": {
+		"BeforePageDisplay": "main",
+		"ResourceLoaderGetConfigVars": "main"
 	},
 	"config": {
 		"GoogleTagManagerContainerID": {

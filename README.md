@@ -92,6 +92,9 @@ The extension defines a new hook, `DataLayerSetup`, which allows other extension
 See file `includes/Hooks/DataLayerSetupHook` for details.
 
 ## Changelog ##
+### 0.7.1
+- Modernized to use service injection, instance-based hook handlers, and namespaced class imports
+
 ### 0.7.0
 - MediaWiki events can now be renamed using mapping configuration (including topic prefix renames)
 - Add QUnit tests for event tracking functionality

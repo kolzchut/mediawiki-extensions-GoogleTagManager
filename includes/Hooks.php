@@ -18,40 +18,37 @@
  */
 namespace MediaWiki\Extension\GoogleTagManager;
 
-use Config;
-use Exception;
-use MediaWiki\MediaWikiServices;
-use OutputPage;
+use MediaWiki\Config\Config;
+use MediaWiki\Hook\BeforePageDisplayHook;
+use MediaWiki\HookContainer\HookContainer;
+use MediaWiki\Output\OutputPage;
+use MediaWiki\ResourceLoader\Hook\ResourceLoaderGetConfigVarsHook;
+use MediaWiki\Title\Title;
 use Skin;
-use Title;
 
-class Hooks {
-	private const EXTENSION_NAME = 'GoogleTagManager';
-	/**
-	 * @var Config
-	 */
-	private static Config $config;
+class Hooks implements BeforePageDisplayHook, ResourceLoaderGetConfigVarsHook {
+
+	public function __construct(
+		private readonly Config $config,
+		private readonly HookContainer $hookContainer,
+	) {
+	}
 
 	/**
 	 * BeforePageDisplay hook handler
 	 * @see https://www.mediawiki.org/wiki/Manual:Hooks/BeforePageDisplay
 	 *
-	 * @param OutputPage &$out
-	 * @param Skin &$skin
-	 *
-	 * @throws Exception
+	 * @param OutputPage $out
+	 * @param Skin $skin
 	 */
-	public static function onBeforePageDisplay( OutputPage &$out, Skin &$skin ) {
-		global $wgGoogleTagManagerContainerID;
-
+	public function onBeforePageDisplay( $out, $skin ): void {
 		/* Check if disabled for site / user / page */
-		if ( self::isDisabled( $out ) ) {
+		if ( $this->isDisabled( $out ) ) {
 			return;
 		}
 
 		$dataLayerArray = [];
-		$hookContainer = MediaWikiServices::getInstance()->getHookContainer();
-		( new Hooks\HookRunner( $hookContainer ) )->onDataLayerSetup( $out, $skin, $dataLayerArray );
+		( new Hooks\HookRunner( $this->hookContainer ) )->onDataLayerSetup( $out, $skin, $dataLayerArray );
 		$dataLayerScript = '<script>window.dataLayer = window.dataLayer || [];';
 		if ( !empty( $dataLayerArray ) ) {
 			$dataLayerScript .= 'window.dataLayer.push( ' . json_encode( $dataLayerArray ) . ' );';
@@ -62,8 +59,8 @@ class Hooks {
 		$noscript = '';
 
 		// Cast into array, if it's not that already
-		$wgGoogleTagManagerContainerID = (array)$wgGoogleTagManagerContainerID;
-		foreach ( $wgGoogleTagManagerContainerID as $id ) {
+		$containerID = (array)$this->config->get( 'GoogleTagManagerContainerID' );
+		foreach ( $containerID as $id ) {
 
 			$script .= <<<SCRIPT
 <!-- Google Tag Manager - ID {$id} -->
@@ -88,7 +85,7 @@ SCRIPT;
 		$out->addHeadItem( 'GoogleTagManager', $script );
 		$out->addHTML( $noscript );
 
-		if ( !empty( self::getConfigVar( 'MediaWikiEvents' ) ) ) {
+		if ( !empty( $this->config->get( 'GoogleTagManagerMediaWikiEvents' ) ) ) {
 			$out->addModules( 'ext.googleTagManager.eventTracking' );
 		}
 	}
@@ -100,30 +97,31 @@ SCRIPT;
 	 * @see https://www.mediawiki.org/wiki/Manual:Hooks/ResourceLoaderGetConfigVars
 	 *
 	 * @param array &$vars array of variables to be added into the output of the startup module.
+	 * @param string $skin
+	 * @param Config $config
 	 */
-	public static function onResourceLoaderGetConfigVars( &$vars ) {
+	public function onResourceLoaderGetConfigVars( array &$vars, $skin, Config $config ): void {
 		$vars['wgGoogleTagManagerConfig'] = [
-			'MediaWikiEvents' => self::getConfigVar( 'MediaWikiEvents' )
+			'MediaWikiEvents' => $this->config->get( 'GoogleTagManagerMediaWikiEvents' )
 		];
 	}
 
 	/**
 	 * @param OutputPage $out
 	 *
-	 * @return false|string
-	 * @throws Exception
+	 * @return bool|string
 	 */
-	private static function isDisabled( OutputPage $out ) {
-		global $wgGoogleTagManagerContainerID;
+	private function isDisabled( OutputPage $out ): bool|string {
+		$containerID = $this->config->get( 'GoogleTagManagerContainerID' );
 
-		if ( $wgGoogleTagManagerContainerID === null ) {
-			return self::messageToComment( 'googletagmanager-error-not-configured' );
+		if ( $containerID === null ) {
+			return $this->messageToComment( 'googletagmanager-error-not-configured' );
 		}
 		if ( $out->getUser()->isAllowed( 'noanalytics' ) ) {
-			return self::messageToComment( 'googletagmanager-disabled-for-user' );
+			return $this->messageToComment( 'googletagmanager-disabled-for-user' );
 		}
-		if ( self::isIgnoredPage( $out->getTitle() ) ) {
-			return self::messageToComment( 'googletagmanager-disabled-for-page' );
+		if ( $this->isIgnoredPage( $out->getTitle() ) ) {
+			return $this->messageToComment( 'googletagmanager-disabled-for-page' );
 		}
 
 		return false;
@@ -134,20 +132,20 @@ SCRIPT;
 	 *
 	 * @return bool
 	 */
-	private static function isIgnoredPage( Title $title ): bool {
-		global $wgGoogleTagManagerIgnoreNsIDs,
-			   $wgGoogleTagManagerIgnorePages,
-			   $wgGoogleTagManagerIgnoreSpecials;
+	private function isIgnoredPage( Title $title ): bool {
+		$ignoreNsIDs = $this->config->get( 'GoogleTagManagerIgnoreNsIDs' );
+		$ignorePages = $this->config->get( 'GoogleTagManagerIgnorePages' );
+		$ignoreSpecials = $this->config->get( 'GoogleTagManagerIgnoreSpecials' );
 
-		$ignoreSpecials = count( array_filter( $wgGoogleTagManagerIgnoreSpecials,
+		$isIgnoredSpecial = count( array_filter( $ignoreSpecials,
 				static function ( $v ) use ( $title ) {
 					return $title->isSpecial( $v );
 				} ) ) > 0;
 
 		return (
-			$ignoreSpecials
-			|| in_array( $title->getNamespace(), $wgGoogleTagManagerIgnoreNsIDs, true )
-			|| in_array( $title->getPrefixedText(), $wgGoogleTagManagerIgnorePages, true )
+			$isIgnoredSpecial
+			|| in_array( $title->getNamespace(), $ignoreNsIDs, true )
+			|| in_array( $title->getPrefixedText(), $ignorePages, true )
 		);
 	}
 
@@ -155,28 +153,13 @@ SCRIPT;
 	 * @param string $messageName
 	 *
 	 * @return string
-	 * @throws Exception
+	 * @throws \MWException
 	 */
-	protected static function messageToComment( string $messageName = '' ): string {
+	protected function messageToComment( string $messageName = '' ): string {
 		if ( empty( $messageName ) ) {
 			throw new \MWException( 'missing a message name!' );
 		}
 
 		return PHP_EOL . '<!-- ' . wfMessage( $messageName )->text() . ' -->' . PHP_EOL;
-	}
-
-	/**
-	 * @param string $name
-	 *
-	 * @return mixed
-	 * @throws \ConfigException
-	 */
-	protected static function getConfigVar( string $name ) {
-		if ( !isset( self::$config ) ) {
-			self::$config = MediaWikiServices::getInstance()->getConfigFactory()
-							->makeConfig( strtolower( self::EXTENSION_NAME ) );
-		}
-
-		return self::$config->get( self::EXTENSION_NAME . $name );
 	}
 }
