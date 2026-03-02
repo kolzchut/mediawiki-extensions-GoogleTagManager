@@ -24,6 +24,7 @@ use MediaWiki\HookContainer\HookContainer;
 use MediaWiki\Output\OutputPage;
 use MediaWiki\ResourceLoader\Hook\ResourceLoaderGetConfigVarsHook;
 use MediaWiki\Title\Title;
+use MessageLocalizer;
 use Skin;
 
 class Hooks implements BeforePageDisplayHook, ResourceLoaderGetConfigVarsHook {
@@ -115,13 +116,13 @@ SCRIPT;
 		$containerID = $this->config->get( 'GoogleTagManagerContainerID' );
 
 		if ( $containerID === null ) {
-			return $this->messageToComment( 'googletagmanager-error-not-configured' );
+			return $this->messageToComment( $out, 'googletagmanager-error-not-configured' );
 		}
 		if ( $out->getUser()->isAllowed( 'noanalytics' ) ) {
-			return $this->messageToComment( 'googletagmanager-disabled-for-user' );
+			return $this->messageToComment( $out, 'googletagmanager-disabled-for-user' );
 		}
 		if ( $this->isIgnoredPage( $out->getTitle() ) ) {
-			return $this->messageToComment( 'googletagmanager-disabled-for-page' );
+			return $this->messageToComment( $out, 'googletagmanager-disabled-for-page' );
 		}
 
 		return false;
@@ -150,16 +151,16 @@ SCRIPT;
 	}
 
 	/**
+	 * @param MessageLocalizer $context
 	 * @param string $messageName
 	 *
 	 * @return string
-	 * @throws \MWException
 	 */
-	protected function messageToComment( string $messageName = '' ): string {
+	protected function messageToComment( MessageLocalizer $context, string $messageName ): string {
 		if ( empty( $messageName ) ) {
 			throw new \MWException( 'missing a message name!' );
 		}
 
-		return PHP_EOL . '<!-- ' . wfMessage( $messageName )->text() . ' -->' . PHP_EOL;
+		return PHP_EOL . '<!-- ' . $context->msg( $messageName )->text() . ' -->' . PHP_EOL;
 	}
 }

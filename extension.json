@@ -21,6 +21,9 @@
 	"AutoloadNamespaces": {
 		"MediaWiki\\Extension\\GoogleTagManager\\": "includes/"
 	},
+	"TestAutoloadNamespaces": {
+		"MediaWiki\\Extension\\GoogleTagManager\\Tests\\": "tests/phpunit/"
+	},
 	"HookHandlers": {
 		"main": {
 			"class": "MediaWiki\\Extension\\GoogleTagManager\\Hooks",
